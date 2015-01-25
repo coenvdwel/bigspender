@@ -1,0 +1,9 @@
+C:\code\BigSpender\BigSpender\bin\Release\BigSpender.exe.config
+C:\code\BigSpender\BigSpender\bin\Release\BigSpender.exe
+C:\code\BigSpender\BigSpender\bin\Release\BigSpender.pdb
+C:\code\BigSpender\BigSpender\obj\Release\BigSpender.Form1.resources
+C:\code\BigSpender\BigSpender\obj\Release\BigSpender.Properties.Resources.resources
+C:\code\BigSpender\BigSpender\obj\Release\BigSpender.csproj.GenerateResource.Cache
+C:\code\BigSpender\BigSpender\obj\Release\BigSpender.exe
+C:\code\BigSpender\BigSpender\obj\Release\BigSpender.pdb
+C:\code\BigSpender\BigSpender\obj\Release\BigSpender.csprojResolveAssemblyReference.cache
