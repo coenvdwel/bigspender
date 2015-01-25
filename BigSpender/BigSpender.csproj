@@ -57,7 +57,6 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Objects\Account.cs" />
-    <Compile Include="Objects\AccountExtensions.cs" />
     <Compile Include="Objects\AccountType.cs" />
     <Compile Include="Objects\Plan.cs" />
     <Compile Include="Objects\MonthViewMode.cs" />

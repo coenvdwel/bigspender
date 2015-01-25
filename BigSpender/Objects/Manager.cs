@@ -112,8 +112,8 @@ namespace BigSpender.Objects
         .Where(a => String.IsNullOrEmpty(category) || a.Category.ToLower().Contains(category.ToLower())))
       {
         table.Rows.Add(a.AccountNumber, a.Name, a.Category, a.Mutations.Count(m => m.Quantity > 0),
-          a.Mutations.Count(m => m.Quantity < 0), a.GetPeriodicDayOfMonth(), a.GetPeriodicFrequency(),
-          a.GetPeriodicQuantity(), a.Mutations.Sum(x => x.Quantity));
+          a.Mutations.Count(m => m.Quantity < 0), a.PeriodicDayOfMonth, a.PeriodicFrequency,
+          a.PeriodicQuantity, a.Mutations.Sum(x => x.Quantity));
       }
 
       return table;
@@ -207,9 +207,9 @@ namespace BigSpender.Objects
         if (a.Type != AccountType.Periodic) continue;
         if (!a.Mutations.Any()) continue;
 
-        var frequency = a.GetPeriodicFrequency();
-        var quantity = a.GetPeriodicQuantity();
-        var day = a.GetPeriodicDayOfMonth();
+        var frequency = a.PeriodicFrequency;
+        var quantity = a.PeriodicQuantity;
+        var day = a.PeriodicDayOfMonth;
 
         if (a.AccountNumber == "NL82RABO0350519137")
         {
@@ -222,9 +222,12 @@ namespace BigSpender.Objects
         if (!day.HasValue) continue;
 
         var date = (from x in a.Mutations
-                    where Math.Abs(x.Quantity) > (Math.Abs(quantity.Value) * (1 - AccountExtensions.DeviationFactor))
+                    where Math.Abs(x.Quantity) > (Math.Abs(quantity.Value) * (1 - Account.DeviationFactor))
                     orderby x.Date descending
-                    select x.Date).First();
+                    select (DateTime?)x.Date).FirstOrDefault()
+                    ?? (from x in a.Mutations
+                        orderby x.Date descending
+                        select x.Date).First();
 
         var remark = String.Empty;
 
