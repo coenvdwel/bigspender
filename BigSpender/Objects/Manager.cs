@@ -256,6 +256,7 @@ namespace BigSpender.Objects
         if (date == DateTime.MinValue)
         {
           remark = "New!";
+          date = DateTime.Today;
           while (date.Day != day.Value) date = date.AddDays(-1);
         }
         // correct date in case of deviation
