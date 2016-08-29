@@ -128,10 +128,20 @@ namespace BigSpender.Objects
       table.Columns.Add("Name", typeof(string));
       table.Columns.Add("Category", typeof(string));
 
+      var sOut = new object[3 + history];
+      var sIn = new object[3 + history];
+      var sTotal = new object[3 + history];
+
       for (var i = history - 1; i >= 0; i--)
       {
         var month = date.AddMonths(-i).ToString("MMM yy", CultureInfo.InvariantCulture);
+        var index = (history - i - 1) + 3;
+
         table.Columns.Add(month, typeof(decimal));
+
+        sOut[index] = 0m;
+        sIn[index] = 0m;
+        sTotal[index] = 0m;
       }
 
       foreach (var a in _accounts)
@@ -151,6 +161,7 @@ namespace BigSpender.Objects
         {
           var fromDate = date.AddMonths(-i);
           var toDate = date.AddMonths(-(i - 1));
+          var index = (history - i - 1) + 3;
 
           var quantity = (from m in _mutations
                           where m.ToAccount == a
@@ -158,14 +169,32 @@ namespace BigSpender.Objects
                                 && m.Date < toDate
                           select m.Quantity).Sum();
 
-          if (quantity == 0) continue;
+          if (quantity > 0) sIn[index] = (decimal)sIn[index] + quantity;
+          else if (quantity < 0) sOut[index] = (decimal)sOut[index] + quantity;
+          else continue;
 
-          data[(history - i - 1) + 3] = quantity;
+          data[index] = quantity;
+          sTotal[index] = (decimal)sTotal[index] + quantity;
+
           count++;
         }
 
         if (count > 0 && (mode != MonthViewMode.Predicted || (count > 2))) table.Rows.Add(data);
       }
+
+      sOut[0] = "Out";
+      sIn[0] = "In";
+      sTotal[0] = "Total";
+
+      sOut[1] = sOut.Skip(3).Average(x => (decimal)x).ToString("#.##");
+      sIn[1] = sIn.Skip(3).Average(x => (decimal)x).ToString("#.##");
+      sTotal[1] = sTotal.Skip(3).Average(x => (decimal)x).ToString("#.##");
+
+      sOut[2] = sIn[2] = sTotal[2] = "xxxxx";
+
+      table.Rows.Add(sOut);
+      table.Rows.Add(sIn);
+      table.Rows.Add(sTotal);
 
       return table;
     }
@@ -205,17 +234,10 @@ namespace BigSpender.Objects
       foreach (var a in _accounts)
       {
         if (a.Type != AccountType.Periodic) continue;
-        if (!a.Mutations.Any()) continue;
 
         var frequency = a.PeriodicFrequency;
         var quantity = a.PeriodicQuantity;
         var day = a.PeriodicDayOfMonth;
-
-        if (a.AccountNumber == "NL82RABO0350519137")
-        {
-          day = day + 1;
-          day--;
-        }
 
         if (!frequency.HasValue || frequency == 0) continue;
         if (!quantity.HasValue || quantity == 0) continue;
@@ -224,19 +246,23 @@ namespace BigSpender.Objects
         var date = (from x in a.Mutations
                     where Math.Abs(x.Quantity) > (Math.Abs(quantity.Value) * (1 - Account.DeviationFactor))
                     orderby x.Date descending
-                    select (DateTime?)x.Date).FirstOrDefault()
-                    ?? (from x in a.Mutations
-                        orderby x.Date descending
-                        select x.Date).First();
+                    select (DateTime?)x.Date).FirstOrDefault() ?? (from x in a.Mutations
+                                                                   orderby x.Date descending
+                                                                   select (DateTime?)x.Date).FirstOrDefault() ?? DateTime.MinValue;
 
         var remark = String.Empty;
 
+        // set date in case of initial mutation
+        if (date == DateTime.MinValue)
+        {
+          remark = "New!";
+          while (date.Day != day.Value) date = date.AddDays(-1);
+        }
         // correct date in case of deviation
-        var dev = date.Day - day.Value;
-        if (Math.Abs(dev) > 2 && Math.Abs(dev) < 27)
+        else if (Math.Abs(date.Day - day.Value) > 2 && Math.Abs(date.Day - day.Value) < 27)
         {
           remark = String.Format("Date corrected, last mutation was on day {0} but the regular day is {1}.", date.Day, day.Value);
-          date = date.AddDays(-dev);
+          date = date.AddDays(-(date.Day - day.Value));
         }
 
         var months = 12 / frequency;

@@ -27,8 +27,24 @@ namespace BigSpender.Parse
 
         if (s[3] == String.Empty)
         {
-          s[3] = s[7];
-          s[1] = s[7];
+          var name = s[1];
+
+          if (name.ToLower().Contains("albert heijn")) name = "Albert Heijn";
+          else if (name.ToLower().Contains("subway")) name = "Subway";
+          else if (name.ToLower().Contains("kruidvat")) name = "Kruidvat";
+          else if (name.ToLower().Contains("weernekers")) name = "Albert Heijn";
+          else if (name.ToLower().Contains("praxis")) name = "Praxis";
+          else if (name.ToLower().Contains("vomar")) name = "Vomar";
+          else if (name.ToLower().Contains("wibra")) name = "Wibra";
+          else if (name.ToLower().Contains("deen")) name = "Deen";
+          else if (name.ToLower().Contains("sodexo")) name = "Lunch werk";
+          else if (name.ToLower().Contains("etos")) name = "Etos";
+
+          s[3] = name;
+          s[1] = name;
+
+          //s[3] = s[7];
+          //s[1] = s[7];
         }
 
         var fromAccount = manager.GetOrCreateAccount(s[2], s[1]);
