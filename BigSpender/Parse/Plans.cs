@@ -1,4 +1,5 @@
-﻿using BigSpender.Objects;
+﻿using BigSpender.Interfaces;
+using BigSpender.Objects;
 using System;
 using System.Globalization;
 using System.IO;
@@ -6,9 +7,9 @@ using System.Linq;
 
 namespace BigSpender.Parse
 {
-  public static class Plans
+  public class Plans : IParse
   {
-    public static bool IsValid(string path)
+    public bool IsValid(string path)
     {
       if (!path.ToLower().EndsWith(".csv")) return false;
       var s = File.ReadAllLines(path).First();
@@ -16,7 +17,7 @@ namespace BigSpender.Parse
       return s == "\"AccountNumber\",\"Date\",\"Quantity\",\"Frequency\",\"Remark\"";
     }
 
-    public static void Parse(Manager manager, string path)
+    public void Parse(Manager manager, string path)
     {
       var lines = File.ReadAllLines(path).Skip(1).ToList();
       foreach (var s in lines.Select(line => line.Split(new[] { "\",\"" }, StringSplitOptions.None)))

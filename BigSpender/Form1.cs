@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using BigSpender.Objects;
 using System.Windows.Forms;
+using System.Data;
 
 namespace BigSpender
 {
@@ -26,7 +27,7 @@ namespace BigSpender
 
     private void Form1_DragDrop(object sender, DragEventArgs e)
     {
-      var files = (string[]) e.Data.GetData(DataFormats.FileDrop);
+      var files = (string[])e.Data.GetData(DataFormats.FileDrop);
       foreach (var f in files) _manager.AddFile(f);
 
       DoUpdate(null, null);
@@ -50,8 +51,8 @@ namespace BigSpender
 
       monthGrid.DataSource = null;
 
-      mutationGrid.DataSource = new BindingSource {DataSource = _manager.GetMutationTable(tbMutationAccount.Text, tbMutationCategory.Text)};
-      accountGrid.DataSource = new BindingSource {DataSource = _manager.GetAccountTable(tbAccountsAccount.Text, tbAccountsCategory.Text)};
+      mutationGrid.DataSource = new BindingSource { DataSource = _manager.GetMutationTable(tbMutationAccount.Text, tbMutationCategory.Text) };
+      accountGrid.DataSource = new BindingSource { DataSource = _manager.GetAccountTable(tbAccountsAccount.Text, tbAccountsCategory.Text) };
       monthGrid.DataSource = new BindingSource { DataSource = _manager.GetMonthTable(mode, (int)tbHistory.Value) };
       cashFlowGrid.DataSource = new BindingSource { DataSource = _manager.GetCashFlow((int)tbCashflowForecast.Value) };
       plansGrid.DataSource = new BindingSource { DataSource = _manager.GetPlansTable() };
@@ -60,12 +61,21 @@ namespace BigSpender
       accountGrid.Sort(accountGrid.Columns[2], ListSortDirection.Ascending);
       monthGrid.Sort(monthGrid.Columns[2], ListSortDirection.Ascending);
       plansGrid.Sort(plansGrid.Columns[0], ListSortDirection.Ascending);
-      
+
       mutationGrid.Refresh();
       accountGrid.Refresh();
       monthGrid.Refresh();
       cashFlowGrid.Refresh();
       plansGrid.Refresh();
+    }
+
+    private void btnMaxPlan_Click(object sender, System.EventArgs e)
+    {
+      var row = plansGrid.Rows[plansGrid.SelectedCells[0].RowIndex].DataBoundItem as DataRowView;
+      var data = row.Row.ItemArray;
+
+      _manager.MaxPlan(data[4].ToString());
+      DoUpdate(sender, e);
     }
   }
 }

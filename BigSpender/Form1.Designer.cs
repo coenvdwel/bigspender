@@ -49,13 +49,14 @@
       this.tbAccountsAccount = new System.Windows.Forms.TextBox();
       this.label6 = new System.Windows.Forms.Label();
       this.accountGrid = new System.Windows.Forms.DataGridView();
+      this.tabPage6 = new System.Windows.Forms.TabPage();
+      this.plansGrid = new System.Windows.Forms.DataGridView();
       this.tabControl1 = new System.Windows.Forms.TabControl();
       this.tabPage2 = new System.Windows.Forms.TabPage();
       this.label7 = new System.Windows.Forms.Label();
       this.tbCashflowForecast = new System.Windows.Forms.NumericUpDown();
       this.cashFlowGrid = new System.Windows.Forms.DataGridView();
-      this.tabPage6 = new System.Windows.Forms.TabPage();
-      this.plansGrid = new System.Windows.Forms.DataGridView();
+      this.btnMaxPlan = new System.Windows.Forms.Button();
       this.tabPage3.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.tbHistory)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.monthGrid)).BeginInit();
@@ -65,12 +66,12 @@
       ((System.ComponentModel.ISupportInitialize)(this.mutationGrid)).BeginInit();
       this.tabPage5.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.accountGrid)).BeginInit();
+      this.tabPage6.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.plansGrid)).BeginInit();
       this.tabControl1.SuspendLayout();
       this.tabPage2.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.tbCashflowForecast)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.cashFlowGrid)).BeginInit();
-      this.tabPage6.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.plansGrid)).BeginInit();
       this.SuspendLayout();
       // 
       // tabPage3
@@ -313,6 +314,34 @@
       this.accountGrid.Size = new System.Drawing.Size(944, 315);
       this.accountGrid.TabIndex = 4;
       // 
+      // tabPage6
+      // 
+      this.tabPage6.Controls.Add(this.btnMaxPlan);
+      this.tabPage6.Controls.Add(this.plansGrid);
+      this.tabPage6.Location = new System.Drawing.Point(4, 22);
+      this.tabPage6.Name = "tabPage6";
+      this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
+      this.tabPage6.Size = new System.Drawing.Size(956, 353);
+      this.tabPage6.TabIndex = 2;
+      this.tabPage6.Text = "Plans";
+      this.tabPage6.UseVisualStyleBackColor = true;
+      // 
+      // plansGrid
+      // 
+      this.plansGrid.AllowUserToAddRows = false;
+      this.plansGrid.AllowUserToDeleteRows = false;
+      this.plansGrid.AllowUserToOrderColumns = true;
+      this.plansGrid.AllowUserToResizeRows = false;
+      this.plansGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.plansGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+      this.plansGrid.Location = new System.Drawing.Point(6, 32);
+      this.plansGrid.Name = "plansGrid";
+      this.plansGrid.ReadOnly = true;
+      this.plansGrid.Size = new System.Drawing.Size(944, 315);
+      this.plansGrid.TabIndex = 5;
+      // 
       // tabControl1
       // 
       this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -388,32 +417,15 @@
       this.cashFlowGrid.Size = new System.Drawing.Size(964, 353);
       this.cashFlowGrid.TabIndex = 4;
       // 
-      // tabPage6
+      // btnMaxPlan
       // 
-      this.tabPage6.Controls.Add(this.plansGrid);
-      this.tabPage6.Location = new System.Drawing.Point(4, 22);
-      this.tabPage6.Name = "tabPage6";
-      this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-      this.tabPage6.Size = new System.Drawing.Size(956, 353);
-      this.tabPage6.TabIndex = 2;
-      this.tabPage6.Text = "Plans";
-      this.tabPage6.UseVisualStyleBackColor = true;
-      // 
-      // plansGrid
-      // 
-      this.plansGrid.AllowUserToAddRows = false;
-      this.plansGrid.AllowUserToDeleteRows = false;
-      this.plansGrid.AllowUserToOrderColumns = true;
-      this.plansGrid.AllowUserToResizeRows = false;
-      this.plansGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.plansGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-      this.plansGrid.Location = new System.Drawing.Point(6, 6);
-      this.plansGrid.Name = "plansGrid";
-      this.plansGrid.ReadOnly = true;
-      this.plansGrid.Size = new System.Drawing.Size(944, 341);
-      this.plansGrid.TabIndex = 5;
+      this.btnMaxPlan.Location = new System.Drawing.Point(6, 6);
+      this.btnMaxPlan.Name = "btnMaxPlan";
+      this.btnMaxPlan.Size = new System.Drawing.Size(100, 20);
+      this.btnMaxPlan.TabIndex = 6;
+      this.btnMaxPlan.Text = "Max!";
+      this.btnMaxPlan.UseVisualStyleBackColor = true;
+      this.btnMaxPlan.Click += new System.EventHandler(this.btnMaxPlan_Click);
       // 
       // Form1
       // 
@@ -441,13 +453,13 @@
       this.tabPage5.ResumeLayout(false);
       this.tabPage5.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)(this.accountGrid)).EndInit();
+      this.tabPage6.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.plansGrid)).EndInit();
       this.tabControl1.ResumeLayout(false);
       this.tabPage2.ResumeLayout(false);
       this.tabPage2.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)(this.tbCashflowForecast)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.cashFlowGrid)).EndInit();
-      this.tabPage6.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.plansGrid)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -481,6 +493,7 @@
     private System.Windows.Forms.NumericUpDown tbCashflowForecast;
     private System.Windows.Forms.TabPage tabPage6;
     private System.Windows.Forms.DataGridView plansGrid;
+    private System.Windows.Forms.Button btnMaxPlan;
 
   }
 }

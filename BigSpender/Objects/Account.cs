@@ -104,7 +104,6 @@ namespace BigSpender.Objects
       if (frequency <= 2) return 1;
       if (frequency <= 4) return 3;
       if (frequency <= 7) return 6;
-      //if (frequency > 13) return 24;
       
       return 12;
     }

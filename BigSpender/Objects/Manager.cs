@@ -1,4 +1,4 @@
-﻿using BigSpender.Parse;
+﻿using BigSpender.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -24,9 +24,13 @@ namespace BigSpender.Objects
 
     public void AddFile(string path)
     {
-      if (Accounts.IsValid(path)) Accounts.Parse(this, path);
-      else if (Plans.IsValid(path)) Plans.Parse(this, path);
-      else if (ING.IsValid(path)) ING.Parse(this, path);
+      var parser = AppDomain.CurrentDomain.GetAssemblies()
+          .SelectMany(a => a.GetTypes().Where(t => typeof(IParse).IsAssignableFrom(t) && t.IsClass))
+          .Select(t => Activator.CreateInstance(t) as IParse)
+          .Where(p => p.IsValid(path))
+          .FirstOrDefault();
+
+      if (parser != null) parser.Parse(this, path);
     }
 
     public Account GetOrCreateAccount(string number, string name)
@@ -62,6 +66,34 @@ namespace BigSpender.Objects
     public void AddPlan(Plan plan)
     {
       _plans.Add(plan);
+    }
+
+    public void MaxPlan(string remark)
+    {
+      decimal i = 1000, d = 0;
+      var p = _plans.Single(x => x.Remark == remark);
+
+      while (i > .01m)
+      {
+        while (CanAffordPlan(p, d)) d -= i;
+
+        d += i;
+        i /= 10;
+      }
+
+      p.Quantity += d;
+    }
+
+    private bool CanAffordPlan(Plan plan, decimal d)
+    {
+      decimal b, a, _, o = plan.Quantity;
+      plan.Quantity += d;
+
+      GetCashFlow(24, out b, out _);
+      GetCashFlow(36, out a, out _);
+
+      plan.Quantity = o;
+      return b <= a;
     }
 
     #endregion
@@ -219,6 +251,12 @@ namespace BigSpender.Objects
 
     public DataTable GetCashFlow(int forecast)
     {
+      decimal m, s;
+      return GetCashFlow(forecast, out m, out s);
+    }
+
+    public DataTable GetCashFlow(int forecast, out decimal m, out decimal s)
+    {
       var plans = new List<Plan>();
       var table = new DataTable();
       var until = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(forecast);
@@ -262,7 +300,7 @@ namespace BigSpender.Objects
         // correct date in case of deviation
         else if (Math.Abs(date.Day - day.Value) > 2 && Math.Abs(date.Day - day.Value) < 27)
         {
-          remark = String.Format("Date corrected, last mutation was on day {0} but the regular day is {1}.", date.Day, day.Value);
+          remark = String.Format("Possible new day ({0})? Using {1}.", date.Day, day.Value);
           date = date.AddDays(-(date.Day - day.Value));
         }
 
@@ -304,11 +342,11 @@ namespace BigSpender.Objects
         }
       }
 
+      m = 0;
+      s = 0;
+
       if (!plans.Any()) return table;
       plans = plans.OrderBy(x => x.Date).ToList();
-
-      var s = 0m;
-      var m = 0m;
 
       foreach (var p in plans)
       {

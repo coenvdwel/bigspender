@@ -1,13 +1,14 @@
-﻿using BigSpender.Objects;
+﻿using BigSpender.Interfaces;
+using BigSpender.Objects;
 using System;
 using System.IO;
 using System.Linq;
 
 namespace BigSpender.Parse
 {
-  public static class Accounts
+  public class Accounts : IParse
   {
-    public static bool IsValid(string path)
+    public bool IsValid(string path)
     {
       if (!path.ToLower().EndsWith(".csv")) return false;
       var s = File.ReadAllLines(path).First();
@@ -15,13 +16,15 @@ namespace BigSpender.Parse
       return s == "\"AccountNumber\",\"Category\",\"Name\",\"Type\",\"Periodic Day Of Month\",\"Periodic Frequency\",\"Periodic Quantity\"";
     }
 
-    public static void Parse(Manager manager, string path)
+    public void Parse(Manager manager, string path)
     {
       var lines = File.ReadAllLines(path).Skip(1).ToList();
-      foreach (var s in lines.Select(line => line.Split(new[] {"\",\""}, StringSplitOptions.None)))
+      foreach (var s in lines.Select(line => line.Split(new[] { "\",\"" }, StringSplitOptions.None)))
       {
+        if (s.Length != 7) continue;
+
         s[0] = s[0].Substring(1);
-        s[s.Length - 1] = s[s.Length - 1].Substring(0, s[s.Length - 1].Length - 1);
+        s[6] = s[6].Substring(0, s[6].Length - 1);
 
         var accounts = s[0].Split('|');
         var other = accounts.Skip(1).ToList();

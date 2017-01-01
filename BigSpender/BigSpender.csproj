@@ -56,6 +56,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IParse.cs" />
     <Compile Include="Objects\Account.cs" />
     <Compile Include="Objects\AccountType.cs" />
     <Compile Include="Objects\Plan.cs" />
@@ -95,6 +96,7 @@
   <ItemGroup>
     <Content Include="money-icon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
