@@ -15,7 +15,7 @@ namespace BigSpender.Parse
       if (!path.ToLower().EndsWith(".csv")) return false;
       var s = File.ReadAllLines(path).First();
 
-      return s == "\"Datum\",\"Naam / Omschrijving\",\"Rekening\",\"Tegenrekening\",\"Code\",\"Af Bij\",\"Bedrag (EUR)\",\"MutatieSoort\",\"Mededelingen\"";
+      return s.Equals("\"Datum\",\"Naam / Omschrijving\",\"Rekening\",\"Tegenrekening\",\"Code\",\"Af Bij\",\"Bedrag (EUR)\",\"Mutatiesoort\",\"Mededelingen\"", StringComparison.OrdinalIgnoreCase);
     }
 
     public void Parse(Manager manager, string path)

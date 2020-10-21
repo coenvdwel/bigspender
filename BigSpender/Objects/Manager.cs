@@ -28,9 +28,9 @@ namespace BigSpender.Objects
           .SelectMany(a => a.GetTypes().Where(t => typeof(IParse).IsAssignableFrom(t) && t.IsClass))
           .Select(t => Activator.CreateInstance(t) as IParse)
           .Where(p => p.IsValid(path))
-          .FirstOrDefault();
+          .FirstOrDefault() ?? throw new Exception("Could not parse file!");
 
-      if (parser != null) parser.Parse(this, path);
+      parser.Parse(this, path);
     }
 
     public Account GetOrCreateAccount(string number, string name)
@@ -325,13 +325,13 @@ namespace BigSpender.Objects
         var date = plan.Date;
         var months = 12 / plan.Frequency;
 
-        while(true)
+        while (true)
         {
           date = date.AddMonths(months);
 
           if (date > until) break;
           if (date < DateTime.Today) continue;
-          
+
           plans.Add(new Plan
           {
             Date = date,
