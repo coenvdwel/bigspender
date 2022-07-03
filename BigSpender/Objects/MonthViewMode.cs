@@ -4,6 +4,7 @@
   {
     Full,
     Registered,
-    Predicted
+    Predicted,
+    Unknown
   }
 }

@@ -38,6 +38,9 @@ namespace BigSpender
       MonthViewMode mode;
       switch (cbDisplay.SelectedItem.ToString())
       {
+        case "Unknown":
+          mode = MonthViewMode.Unknown;
+          break;
         case "Predicted":
           mode = MonthViewMode.Predicted;
           break;

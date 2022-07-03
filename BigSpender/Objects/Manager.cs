@@ -180,7 +180,7 @@ namespace BigSpender.Objects
       {
         if (a.Type == AccountType.Owned) continue;
         if (a.Type != AccountType.Periodic && mode == MonthViewMode.Registered) continue;
-        if (a.Type == AccountType.Periodic && mode == MonthViewMode.Predicted) continue;
+        if (a.Type == AccountType.Periodic && mode == MonthViewMode.Unknown) continue;
 
         var data = new object[3 + history];
         var count = 0;

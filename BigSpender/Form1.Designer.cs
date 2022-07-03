@@ -137,7 +137,8 @@
       this.cbDisplay.Items.AddRange(new object[] {
             "Registered",
             "Predicted",
-            "Full"});
+            "Full",
+            "Unknown"});
       this.cbDisplay.Location = new System.Drawing.Point(53, 6);
       this.cbDisplay.Name = "cbDisplay";
       this.cbDisplay.Size = new System.Drawing.Size(121, 21);
