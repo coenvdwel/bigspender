@@ -249,14 +249,13 @@ namespace BigSpender.Objects
       return table;
     }
 
-    public DataTable GetCashFlow(int forecast)
-    {
-      decimal m, s;
-      return GetCashFlow(forecast, out m, out s);
-    }
+    public DataTable GetCashFlow(int forecast) => GetCashFlow(forecast, out _, out _);
 
     public DataTable GetCashFlow(int forecast, out decimal m, out decimal s)
     {
+      m = 0;
+      s = 0;
+
       var plans = new List<Plan>();
       var table = new DataTable();
       var until = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(forecast);
@@ -269,6 +268,8 @@ namespace BigSpender.Objects
       table.Columns.Add("Quantity", typeof(decimal));
       table.Columns.Add("Running", typeof(decimal));
 
+      // create a timeline of all periodic accounts
+
       foreach (var a in _accounts)
       {
         if (a.Type != AccountType.Periodic) continue;
@@ -276,35 +277,27 @@ namespace BigSpender.Objects
         var frequency = a.PeriodicFrequency;
         var quantity = a.PeriodicQuantity;
         var day = a.PeriodicDayOfMonth;
+        var remark = string.Empty;
 
         if (!frequency.HasValue || frequency == 0) continue;
         if (!quantity.HasValue || quantity == 0) continue;
         if (!day.HasValue) continue;
 
-        var date = (from x in a.Mutations
-                    where Math.Abs(x.Quantity) > (Math.Abs(quantity.Value) * (1 - Account.DeviationFactor))
-                    orderby x.Date descending
-                    select (DateTime?)x.Date).FirstOrDefault() ?? (from x in a.Mutations
-                                                                   orderby x.Date descending
-                                                                   select (DateTime?)x.Date).FirstOrDefault() ?? DateTime.MinValue;
+        var date = a.GetLastDate();
+        var months = 12 / frequency;
 
-        var remark = String.Empty;
-
-        // set date in case of initial mutation
         if (date == DateTime.MinValue)
         {
           remark = "New!";
           date = DateTime.Today;
           while (date.Day != day.Value) date = date.AddDays(-1);
         }
-        // correct date in case of deviation
         else if (Math.Abs(date.Day - day.Value) > 2 && Math.Abs(date.Day - day.Value) < 27)
         {
-          remark = String.Format("Possible new day ({0})? Using {1}.", date.Day, day.Value);
+          remark = string.Format("Possible new day ({0})? Using {1}.", date.Day, day.Value);
           date = date.AddDays(-(date.Day - day.Value));
         }
 
-        var months = 12 / frequency;
         while (true)
         {
           date = date.AddMonths(months.Value);
@@ -319,6 +312,8 @@ namespace BigSpender.Objects
           });
         }
       }
+
+      // add the plans to the timeline
 
       foreach (var plan in _plans)
       {
@@ -342,11 +337,11 @@ namespace BigSpender.Objects
         }
       }
 
-      m = 0;
-      s = 0;
+      // sort timeline and calculate minimum value for beginstand
+
+      plans = plans.OrderBy(x => x.Date).ToList();
 
       if (!plans.Any()) return table;
-      plans = plans.OrderBy(x => x.Date).ToList();
 
       foreach (var p in plans)
       {
@@ -355,13 +350,17 @@ namespace BigSpender.Objects
       }
 
       table.Rows.Add(plans[0].Date, "BEGINSTAND", "BEGINSTAND", "BEGINSTAND", "BEGINSTAND", -m, -m);
-
       s = -m;
+
+      // output timeline
+
       foreach (var p in plans)
       {
         s += p.Quantity;
         table.Rows.Add(p.Date, p.Remark, p.Account.AccountNumber, p.Account.Name, p.Account.Category, p.Quantity, s);
       }
+
+      // eindstand
 
       table.Rows.Add(plans[plans.Count - 1].Date, "EINDSTAND", "EINDSTAND", "EINDSTAND", "EINDSTAND", s, s);
 

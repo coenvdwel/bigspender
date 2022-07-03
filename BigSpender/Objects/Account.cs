@@ -42,44 +42,47 @@ namespace BigSpender.Objects
     {
       get
       {
-        if (_periodicQuantity.HasValue) return _periodicQuantity; 
+        if (_periodicQuantity.HasValue) return _periodicQuantity;
         return GetPeriodicQuantity();
       }
       set { _periodicQuantity = value; }
     }
 
-    public static decimal DeviationFactor = 0.25m;
+    private static decimal _deviationFactor = 0.25m;
+
+    public DateTime GetLastDate()
+    {
+      return Mutations.GroupBy(x => x.Date.Month).Where(x => Math.Abs(x.Sum(m => m.Quantity)) > (Math.Abs(PeriodicQuantity.Value) * (1 - _deviationFactor))).Select(x => (DateTime?)x.Max(m => m.Date)).OrderByDescending(x => x).FirstOrDefault()
+           ?? Mutations.Where(x => Math.Abs(x.Quantity) > (Math.Abs(PeriodicQuantity.Value) * (1 - _deviationFactor))).Select(x => (DateTime?)x.Date).OrderByDescending(x => x).FirstOrDefault()
+           ?? Mutations.Select(x => (DateTime?)x.Date).OrderByDescending(x => x).FirstOrDefault()
+           ?? DateTime.MinValue;
+    }
 
     private List<Mutation> GetRegularRecentMutations(int period = 12)
     {
-      var date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+      var date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-period);
+      var mutations = Mutations.Where(x => x.Date >= date).ToList();
 
-      var mutations = (from m in Mutations
-                       where m.Date >= date.AddMonths(-period)
-                       orderby m.Quantity
-                       select m).ToList();
+      if (!mutations.Any()) return new List<Mutation>();
 
-      if (!mutations.Any()) return mutations;
+      var monthlyMutations = mutations.GroupBy(x => x.Date.Month);
 
-      decimal median;
-      if (mutations.Count % 2 == 0)
+      var medianSums = monthlyMutations.Select(x => x.Sum(m => m.Quantity)).OrderBy(x => x).ToList();
+      var median = medianSums[medianSums.Count / 2];
+
+      if (medianSums.Count % 2 == 0)
       {
-        var a = mutations[mutations.Count / 2 - 1].Quantity;
-        var b = mutations[mutations.Count / 2].Quantity;
-        median = (a + b) / 2m;
-      }
-      else
-      {
-        median = mutations[mutations.Count / 2].Quantity;
+        median = (medianSums[medianSums.Count / 2 - 1] + median) / 2m;
       }
 
-      var min = Math.Min((median * (1 - DeviationFactor)), (median * (1 + DeviationFactor)));
-      var max = Math.Max((median * (1 - DeviationFactor)), (median * (1 + DeviationFactor)));
+      var min = Math.Min(median * (1 - _deviationFactor), median * (1 + _deviationFactor));
+      var max = Math.Max(median * (1 - _deviationFactor), median * (1 + _deviationFactor));
 
-      return (from m in mutations
-              where m.Quantity >= min
-                    && m.Quantity < max
-              select m).ToList();
+      return (from m in monthlyMutations
+              let sum = m.Sum(x => x.Quantity)
+              where sum >= min && sum < max
+              from x in m
+              select x).ToList();
     }
 
     private int? GetPeriodicDayOfMonth()
@@ -104,7 +107,7 @@ namespace BigSpender.Objects
       if (frequency <= 2) return 1;
       if (frequency <= 4) return 3;
       if (frequency <= 7) return 6;
-      
+
       return 12;
     }
 
